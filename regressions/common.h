@@ -171,7 +171,7 @@ common_gettimeofday(struct timeval *tv, void *tz)
 
 	return 0;
 #else
-	return gettimeofday(tv, tz);
+	return gettimeofday(tv, (__timezone_ptr_t)tz);
 #endif
 }
 

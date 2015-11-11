@@ -91,8 +91,8 @@ ck_barrier_combining_queue_enqueue(struct ck_barrier_combining_queue *queue,
 
 
 void
-ck_barrier_combining_group_init(struct ck_barrier_combining *root,
-    struct ck_barrier_combining_group *tnode,
+ck_barrier_combining_group_init(ck_barrier_combining_t *root,
+    ck_barrier_combining_group_t *tnode,
     unsigned int nthr)
 {
 	struct ck_barrier_combining_group *node;
@@ -141,8 +141,8 @@ leave:
 }
 
 void
-ck_barrier_combining_init(struct ck_barrier_combining *root,
-    struct ck_barrier_combining_group *init_root)
+ck_barrier_combining_init(ck_barrier_combining_t *root,
+    ck_barrier_combining_group_t *init_root)
 {
 
 	init_root->k = 0;
@@ -155,7 +155,7 @@ ck_barrier_combining_init(struct ck_barrier_combining *root,
 }
 
 static void
-ck_barrier_combining_aux(struct ck_barrier_combining *barrier,
+ck_barrier_combining_aux(ck_barrier_combining_t *barrier,
     struct ck_barrier_combining_group *tnode,
     unsigned int sense)
 {
@@ -194,7 +194,7 @@ ck_barrier_combining_aux(struct ck_barrier_combining *barrier,
 }
 
 void
-ck_barrier_combining(struct ck_barrier_combining *barrier,
+ck_barrier_combining(ck_barrier_combining_t *barrier,
     struct ck_barrier_combining_group *tnode,
     struct ck_barrier_combining_state *state)
 {

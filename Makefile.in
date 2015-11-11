@@ -47,8 +47,8 @@ install: all install-headers
 	$(MAKE) -C doc install
 	mkdir -p $(DESTDIR)/$(LIBRARY) || exit
 	cp src/libck.so $(DESTDIR)/$(LIBRARY)/libck.so.$(VERSION) || exit
-	ln -s libck.so.$(VERSION) $(DESTDIR)/$(LIBRARY)/libck.so
-	ln -s libck.so.$(VERSION) $(DESTDIR)/$(LIBRARY)/libck.so.$(VERSION_MAJOR)
+	ln -sf libck.so.$(VERSION) $(DESTDIR)/$(LIBRARY)/libck.so
+	ln -sf libck.so.$(VERSION) $(DESTDIR)/$(LIBRARY)/libck.so.$(VERSION_MAJOR)
 	chmod 744 $(DESTDIR)/$(LIBRARY)/libck.so* || exit
 	mkdir -p $(DESTDIR)/$(PKGCONFIG_DATA) || exit
 	chmod 755 $(DESTDIR)/$(PKGCONFIG_DATA)

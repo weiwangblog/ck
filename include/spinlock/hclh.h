@@ -64,7 +64,7 @@ ck_spinlock_hclh_locked(struct ck_spinlock_hclh **queue)
 	struct ck_spinlock_hclh *head;
 
 	ck_pr_fence_load();
-	head = ck_pr_load_ptr(queue);
+	head = (struct ck_spinlock_hclh *)ck_pr_load_ptr(queue);
 	ck_pr_fence_load();
 	return ck_pr_load_uint(&head->wait);
 }
@@ -85,7 +85,7 @@ ck_spinlock_hclh_lock(struct ck_spinlock_hclh **glob_queue,
 	ck_pr_fence_store_atomic();
 
 	/* Mark current request as last request. Save reference to previous request. */
-	previous = ck_pr_fas_ptr(local_queue, thread);
+	previous = (struct ck_spinlock_hclh *)ck_pr_fas_ptr(local_queue, thread);
 	thread->previous = previous;
 
 	/* Wait until previous thread from the local queue is done with lock. */
@@ -101,8 +101,8 @@ ck_spinlock_hclh_lock(struct ck_spinlock_hclh **glob_queue,
 	} 
 
 	/* Now we need to splice the local queue into the global queue. */
-	local_tail = ck_pr_load_ptr(local_queue);
-	previous = ck_pr_fas_ptr(glob_queue, local_tail);
+	local_tail = (struct ck_spinlock_hclh *)ck_pr_load_ptr(local_queue);
+	previous = (struct ck_spinlock_hclh *)ck_pr_fas_ptr(glob_queue, local_tail);
 
 	ck_pr_store_uint(&local_tail->splice, true);
 

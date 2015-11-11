@@ -230,7 +230,7 @@ main(int argc, char *argv[])
 
 	for (i = 0; i < keys_length; i++)
 		d += table_insert(keys[i]) == false;
-	ck_ht_stat(&ht, &st);
+	ck_ht_stat_get(&ht, &st);
 
 	fprintf(stderr, "# %zu entries stored, %u duplicates, %" PRIu64 " probe.\n",
 	    table_count(), d, st.probe_maximum);

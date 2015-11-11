@@ -148,7 +148,7 @@ ck_brlock_read_register(struct ck_brlock *br, struct ck_brlock_reader *reader)
 	/* Implicit compiler barrier. */
 	ck_brlock_write_lock(br);
 
-	reader->next = ck_pr_load_ptr(&br->readers);
+	reader->next = (struct ck_brlock_reader *)ck_pr_load_ptr(&br->readers);
 	if (reader->next != NULL)
 		reader->next->previous = reader;
 	ck_pr_store_ptr(&br->readers, reader);

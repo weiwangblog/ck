@@ -57,13 +57,13 @@ ck_hp_stack_pop_mpmc(ck_hp_record_t *record, struct ck_stack *target)
 	struct ck_stack_entry *entry, *update;
 
 	do {
-		entry = ck_pr_load_ptr(&target->head);
+		entry = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 		if (entry == NULL)
 			return NULL;
 
 		ck_hp_set(record, 0, entry);
 		ck_pr_fence_store_load();
-	} while (entry != ck_pr_load_ptr(&target->head));
+	} while (entry != (struct ck_stack_entry *)ck_pr_load_ptr(&target->head));
 
 	while (ck_pr_cas_ptr_value(&target->head, entry, entry->next, &entry) == false) {
 		if (entry == NULL)
@@ -71,12 +71,12 @@ ck_hp_stack_pop_mpmc(ck_hp_record_t *record, struct ck_stack *target)
 
 		ck_hp_set(record, 0, entry);
 		ck_pr_fence_store_load();
-		update = ck_pr_load_ptr(&target->head);
+		update = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 		while (entry != update) {
 			ck_hp_set(record, 0, update);
 			ck_pr_fence_store_load();
 			entry = update;
-			update = ck_pr_load_ptr(&target->head);
+			update = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 			if (update == NULL)
 				return NULL;
 		}
@@ -90,13 +90,13 @@ ck_hp_stack_trypop_mpmc(ck_hp_record_t *record, struct ck_stack *target, struct 
 {
 	struct ck_stack_entry *entry;
 
-	entry = ck_pr_load_ptr(&target->head);
+	entry = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 	if (entry == NULL)
 		return false;
 
 	ck_hp_set(record, 0, entry);
 	ck_pr_fence_store_load();
-	if (entry != ck_pr_load_ptr(&target->head))
+	if (entry != (struct ck_stack_entry *)ck_pr_load_ptr(&target->head))
 		goto leave;
 
 	if (ck_pr_cas_ptr_value(&target->head, entry, entry->next, &entry) == false)

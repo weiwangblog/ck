@@ -127,7 +127,7 @@ bool ck_hs_gc(ck_hs_t *, unsigned long, unsigned long);
 unsigned long ck_hs_count(ck_hs_t *);
 bool ck_hs_reset(ck_hs_t *);
 bool ck_hs_reset_size(ck_hs_t *, unsigned long);
-void ck_hs_stat(ck_hs_t *, struct ck_hs_stat *);
+void ck_hs_stat_get(ck_hs_t *, struct ck_hs_stat *);
 
 #endif /* _CK_HS_H */
 

@@ -94,7 +94,7 @@ ck_spinlock_mcs_lock(struct ck_spinlock_mcs **queue, struct ck_spinlock_mcs *nod
 	 * returns NULL, it means the queue was empty. If the queue was empty,
 	 * then the operation is complete.
 	 */
-	previous = ck_pr_fas_ptr(queue, node);
+	previous = (struct ck_spinlock_mcs *)ck_pr_fas_ptr(queue, node);
 	if (previous != NULL) {
 		/* Let the previous lock holder know that we are waiting on them. */
 		ck_pr_store_ptr(&previous->next, node);
@@ -113,7 +113,7 @@ ck_spinlock_mcs_unlock(struct ck_spinlock_mcs **queue, struct ck_spinlock_mcs *n
 
 	ck_pr_fence_release();
 
-	next = ck_pr_load_ptr(&node->next);
+	next = (struct ck_spinlock_mcs *)ck_pr_load_ptr(&node->next);
 	if (next == NULL) {
 		/*
 		 * If there is no request following us then it is a possibilty
@@ -131,7 +131,7 @@ ck_spinlock_mcs_unlock(struct ck_spinlock_mcs **queue, struct ck_spinlock_mcs *n
 		 * a consistent state to wake up the incoming lock request.
 		 */
 		for (;;) {
-			next = ck_pr_load_ptr(&node->next);
+			next = (struct ck_spinlock_mcs *)ck_pr_load_ptr(&node->next);
 			if (next != NULL)
 				break;
 

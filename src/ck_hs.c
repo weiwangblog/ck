@@ -129,7 +129,7 @@ ck_hs_next(struct ck_hs *hs, struct ck_hs_iterator *i, void **key)
 }
 
 void
-ck_hs_stat(struct ck_hs *hs, struct ck_hs_stat *st)
+ck_hs_stat_get(struct ck_hs *hs, struct ck_hs_stat *st)
 {
 	struct ck_hs_map *map = hs->map;
 

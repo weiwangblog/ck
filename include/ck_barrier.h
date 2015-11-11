@@ -30,11 +30,11 @@
 
 #include <ck_spinlock.h>
 
-struct ck_barrier_centralized {
+struct ck_barrier_centralized_s {
 	unsigned int value;
 	unsigned int sense;
 };
-typedef struct ck_barrier_centralized ck_barrier_centralized_t;
+typedef struct ck_barrier_centralized_s ck_barrier_centralized_t;
 
 struct ck_barrier_centralized_state {
 	unsigned int sense;
@@ -65,11 +65,11 @@ typedef struct ck_barrier_combining_state ck_barrier_combining_state_t;
 
 #define CK_BARRIER_COMBINING_STATE_INITIALIZER {~0}
 
-struct ck_barrier_combining {
+struct ck_barrier_combining_s {
 	struct ck_barrier_combining_group *root;
 	ck_spinlock_fas_t mutex;
 };
-typedef struct ck_barrier_combining ck_barrier_combining_t;
+typedef struct ck_barrier_combining_s ck_barrier_combining_t;
 
 void ck_barrier_combining_init(ck_barrier_combining_t *, ck_barrier_combining_group_t *);
 
@@ -86,13 +86,13 @@ struct ck_barrier_dissemination_flag {
 };
 typedef struct ck_barrier_dissemination_flag ck_barrier_dissemination_flag_t;
 
-struct ck_barrier_dissemination {
+struct ck_barrier_dissemination_s {
 	unsigned int nthr;
 	unsigned int size;
 	unsigned int tid;
 	struct ck_barrier_dissemination_flag *flags[2];
 };
-typedef struct ck_barrier_dissemination ck_barrier_dissemination_t;
+typedef struct ck_barrier_dissemination_s ck_barrier_dissemination_t;
 
 struct ck_barrier_dissemination_state {
 	int 		parity;
@@ -119,11 +119,11 @@ struct ck_barrier_tournament_round {
 };
 typedef struct ck_barrier_tournament_round ck_barrier_tournament_round_t;
 
-struct ck_barrier_tournament {
+struct ck_barrier_tournament_s {
 	unsigned int tid;
 	struct ck_barrier_tournament_round **rounds;
 };
-typedef struct ck_barrier_tournament ck_barrier_tournament_t;
+typedef struct ck_barrier_tournament_s ck_barrier_tournament_t;
 
 struct ck_barrier_tournament_state {
 	unsigned int sense;
@@ -139,7 +139,7 @@ void ck_barrier_tournament_init(ck_barrier_tournament_t *,
 unsigned int ck_barrier_tournament_size(unsigned int);
 void ck_barrier_tournament(ck_barrier_tournament_t *, ck_barrier_tournament_state_t *);
 
-struct ck_barrier_mcs {
+struct ck_barrier_mcs_s {
 	unsigned int tid;
 	unsigned int *children[2];
 	unsigned int childnotready[4];
@@ -148,7 +148,7 @@ struct ck_barrier_mcs {
 	unsigned int *parent;
 	unsigned int parentsense;
 };
-typedef struct ck_barrier_mcs ck_barrier_mcs_t;
+typedef struct ck_barrier_mcs_s ck_barrier_mcs_t;
 
 struct ck_barrier_mcs_state {
 	unsigned int sense;
@@ -161,4 +161,3 @@ void ck_barrier_mcs_subscribe(ck_barrier_mcs_t *, ck_barrier_mcs_state_t *);
 void ck_barrier_mcs(ck_barrier_mcs_t *, ck_barrier_mcs_state_t *);
 
 #endif /* _CK_BARRIER_H */
-

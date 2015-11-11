@@ -37,7 +37,7 @@
 struct _ck_array {
 	unsigned int n_committed;
 	unsigned int length;
-	void *values[];
+	void *values[1];
 };
 
 struct ck_array {
@@ -66,7 +66,7 @@ void ck_array_deinit(ck_array_t *, bool);
 CK_CC_INLINE static unsigned int
 ck_array_length(struct ck_array *array)
 {
-	struct _ck_array *a = ck_pr_load_ptr(&array->active);
+	struct _ck_array *a = (struct _ck_array *)ck_pr_load_ptr(&array->active);
 
 	ck_pr_fence_load();
 	return ck_pr_load_uint(&a->n_committed);
@@ -75,7 +75,7 @@ ck_array_length(struct ck_array *array)
 CK_CC_INLINE static void *
 ck_array_buffer(struct ck_array *array, unsigned int *length)
 {
-	struct _ck_array *a = ck_pr_load_ptr(&array->active);
+	struct _ck_array *a = (struct _ck_array *)ck_pr_load_ptr(&array->active);
 
 	ck_pr_fence_load();
 	*length = ck_pr_load_uint(&a->n_committed);
@@ -90,7 +90,7 @@ ck_array_initialized(struct ck_array *array)
 }
 
 #define CK_ARRAY_FOREACH(a, i, b)		   	\
-	(i)->snapshot = ck_pr_load_ptr(&(a)->active);	\
+	(i)->snapshot = (struct _ck_array *)ck_pr_load_ptr(&(a)->active);	\
 	ck_pr_fence_load();				\
 	for (unsigned int _ck_i = 0;		   	\
 	    _ck_i < (a)->active->n_committed &&		\

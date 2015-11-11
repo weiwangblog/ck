@@ -79,13 +79,13 @@ ck_hp_fifo_enqueue_mpmc(ck_hp_record_t *record,
 	ck_pr_fence_store_atomic();
 
 	for (;;) {
-		tail = ck_pr_load_ptr(&fifo->tail);
+		tail = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->tail);
 		ck_hp_set(record, 0, tail);
 		ck_pr_fence_store_load();
-		if (tail != ck_pr_load_ptr(&fifo->tail))
+		if (tail != (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->tail))
 			continue;
 
-		next = ck_pr_load_ptr(&tail->next);
+		next = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&tail->next);
 		if (next != NULL) {
 			ck_pr_cas_ptr(&fifo->tail, tail, next);
 			continue;
@@ -110,13 +110,13 @@ ck_hp_fifo_tryenqueue_mpmc(ck_hp_record_t *record,
 	entry->next = NULL;
 	ck_pr_fence_store_atomic();
 
-	tail = ck_pr_load_ptr(&fifo->tail);
+	tail = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->tail);
 	ck_hp_set(record, 0, tail);
 	ck_pr_fence_store_load();
-	if (tail != ck_pr_load_ptr(&fifo->tail))
+	if (tail != (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->tail))
 		return false;
 
-	next = ck_pr_load_ptr(&tail->next);
+	next = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&tail->next);
 	if (next != NULL) {
 		ck_pr_cas_ptr(&fifo->tail, tail, next);
 		return false;
@@ -136,18 +136,18 @@ ck_hp_fifo_dequeue_mpmc(ck_hp_record_t *record,
 	struct ck_hp_fifo_entry *head, *tail, *next;
 
 	for (;;) {
-		head = ck_pr_load_ptr(&fifo->head);
+		head = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->head);
 		ck_pr_fence_load();
-		tail = ck_pr_load_ptr(&fifo->tail);
+		tail = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->tail);
 		ck_hp_set(record, 0, head);
 		ck_pr_fence_store_load();
-		if (head != ck_pr_load_ptr(&fifo->head))
+		if (head != (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->head))
 			continue;
 
-		next = ck_pr_load_ptr(&head->next);
+		next = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&head->next);
 		ck_hp_set(record, 1, next);
 		ck_pr_fence_store_load();
-		if (head != ck_pr_load_ptr(&fifo->head))
+		if (head != (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->head))
 			continue;
 
 		if (head == tail) {
@@ -171,18 +171,18 @@ ck_hp_fifo_trydequeue_mpmc(ck_hp_record_t *record,
 {
 	struct ck_hp_fifo_entry *head, *tail, *next;
 
-	head = ck_pr_load_ptr(&fifo->head);
+	head = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->head);
 	ck_pr_fence_load();
-	tail = ck_pr_load_ptr(&fifo->tail);
+	tail = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->tail);
 	ck_hp_set(record, 0, head);
 	ck_pr_fence_store_load();
-	if (head != ck_pr_load_ptr(&fifo->head))
+	if (head != (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->head))
 		return NULL;
 
-	next = ck_pr_load_ptr(&head->next);
+	next = (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&head->next);
 	ck_hp_set(record, 1, next);
 	ck_pr_fence_store_load();
-	if (head != ck_pr_load_ptr(&fifo->head))
+	if (head != (struct ck_hp_fifo_entry *)ck_pr_load_ptr(&fifo->head))
 		return NULL;
 
 	if (head == tail) {

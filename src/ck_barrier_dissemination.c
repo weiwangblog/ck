@@ -33,7 +33,7 @@
 #include "ck_internal.h"
 
 void
-ck_barrier_dissemination_init(struct ck_barrier_dissemination *barrier,
+ck_barrier_dissemination_init(ck_barrier_dissemination_t *barrier,
     struct ck_barrier_dissemination_flag **barrier_internal,
     unsigned int nthr)
 {
@@ -76,7 +76,7 @@ ck_barrier_dissemination_init(struct ck_barrier_dissemination *barrier,
 }
 
 void
-ck_barrier_dissemination_subscribe(struct ck_barrier_dissemination *barrier,
+ck_barrier_dissemination_subscribe(ck_barrier_dissemination_t *barrier,
     struct ck_barrier_dissemination_state *state)
 {
 
@@ -94,7 +94,7 @@ ck_barrier_dissemination_size(unsigned int nthr)
 }
 
 void
-ck_barrier_dissemination(struct ck_barrier_dissemination *barrier,
+ck_barrier_dissemination(ck_barrier_dissemination_t *barrier,
     struct ck_barrier_dissemination_state *state)
 {
 	unsigned int i;

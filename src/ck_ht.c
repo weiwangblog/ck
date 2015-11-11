@@ -95,7 +95,7 @@ struct ck_ht_map {
 };
 
 void
-ck_ht_stat(struct ck_ht *table,
+ck_ht_stat_get(struct ck_ht *table,
     struct ck_ht_stat *st)
 {
 	struct ck_ht_map *map = table->map;
@@ -106,7 +106,7 @@ ck_ht_stat(struct ck_ht *table,
 }
 
 void
-ck_ht_hash(struct ck_ht_hash *h,
+ck_ht_hash(ck_ht_hash_t *h,
     struct ck_ht *table,
     const void *key,
     uint16_t key_length)
@@ -117,7 +117,7 @@ ck_ht_hash(struct ck_ht_hash *h,
 }
 
 void
-ck_ht_hash_direct(struct ck_ht_hash *h,
+ck_ht_hash_direct(ck_ht_hash_t *h,
     struct ck_ht *table,
     uintptr_t key)
 {
@@ -127,7 +127,7 @@ ck_ht_hash_direct(struct ck_ht_hash *h,
 }
 
 static void
-ck_ht_hash_wrapper(struct ck_ht_hash *h,
+ck_ht_hash_wrapper(ck_ht_hash_t *h,
     const void *key,
     size_t length,
     uint64_t seed)
@@ -189,7 +189,7 @@ ck_ht_map_create(struct ck_ht *table, uint64_t entries)
 
 static inline void
 ck_ht_map_bound_set(struct ck_ht_map *m,
-    struct ck_ht_hash h,
+    ck_ht_hash_t h,
     uint64_t n_probes)
 {
 	uint64_t offset = h.value & m->mask;
@@ -209,7 +209,7 @@ ck_ht_map_bound_set(struct ck_ht_map *m,
 }
 
 static inline uint64_t
-ck_ht_map_bound_get(struct ck_ht_map *m, struct ck_ht_hash h)
+ck_ht_map_bound_get(struct ck_ht_map *m, ck_ht_hash_t h)
 {
 	uint64_t offset = h.value & m->mask;
 	uint64_t r = CK_HT_WORD_MAX;
@@ -413,7 +413,7 @@ ck_ht_gc(struct ck_ht *ht, unsigned long cycles, unsigned long seed)
 
 	for (i = 0; i < map->capacity; i++) {
 		struct ck_ht_entry *entry, *priority, snapshot;
-		struct ck_ht_hash h;
+		ck_ht_hash_t h;
 		uint64_t probes_wr;
 		uint64_t offset;
 
@@ -655,7 +655,7 @@ ck_ht_grow_spmc(struct ck_ht *table, uint64_t capacity)
 {
 	struct ck_ht_map *map, *update;
 	struct ck_ht_entry *bucket, *previous;
-	struct ck_ht_hash h;
+	ck_ht_hash_t h;
 	size_t k, i, j, offset;
 	uint64_t probes;
 

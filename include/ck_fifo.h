@@ -137,7 +137,7 @@ ck_fifo_spsc_dequeue(struct ck_fifo_spsc *fifo, void *value)
 	 * If the stub entry does not point to an entry, then the queue is
 	 * empty.
 	 */
-	entry = ck_pr_load_ptr(&fifo->head->next);
+	entry = (struct ck_fifo_spsc_entry *)ck_pr_load_ptr(&fifo->head->next);
 	if (entry == NULL)
 		return false;
 
@@ -158,7 +158,7 @@ ck_fifo_spsc_recycle(struct ck_fifo_spsc *fifo)
 	struct ck_fifo_spsc_entry *garbage;
 
 	if (fifo->head_snapshot == fifo->garbage) {
-		fifo->head_snapshot = ck_pr_load_ptr(&fifo->head);
+		fifo->head_snapshot = (struct ck_fifo_spsc_entry *)ck_pr_load_ptr(&fifo->head);
 		if (fifo->head_snapshot == fifo->garbage)
 			return NULL;
 	}
@@ -171,7 +171,7 @@ ck_fifo_spsc_recycle(struct ck_fifo_spsc *fifo)
 CK_CC_INLINE static bool
 ck_fifo_spsc_isempty(struct ck_fifo_spsc *fifo)
 {
-	struct ck_fifo_spsc_entry *head = ck_pr_load_ptr(&fifo->head);
+	struct ck_fifo_spsc_entry *head = (struct ck_fifo_spsc_entry *)ck_pr_load_ptr(&fifo->head);
 	return ck_pr_load_ptr(&head->next) == NULL;
 }
 
@@ -223,6 +223,16 @@ ck_fifo_mpmc_init(struct ck_fifo_mpmc *fifo, struct ck_fifo_mpmc_entry *stub)
 	return;
 }
 
+// RIFT Added This
+CK_CC_INLINE static void
+ck_fifo_mpmc_deinit(struct ck_fifo_mpmc *fifo, struct ck_fifo_mpmc_entry **garbage)
+{
+
+  *garbage = fifo->head.pointer;
+  fifo->head.pointer = fifo->tail.pointer = NULL;
+	return;
+}
+
 CK_CC_INLINE static void
 ck_fifo_mpmc_enqueue(struct ck_fifo_mpmc *fifo,
 		     struct ck_fifo_mpmc_entry *entry,
@@ -240,11 +250,11 @@ ck_fifo_mpmc_enqueue(struct ck_fifo_mpmc *fifo,
 	ck_pr_fence_store_atomic();
 
 	for (;;) {
-		tail.generation = ck_pr_load_ptr(&fifo->tail.generation);
+		tail.generation = (char *)ck_pr_load_ptr(&fifo->tail.generation);
 		ck_pr_fence_load();
-		tail.pointer = ck_pr_load_ptr(&fifo->tail.pointer);
-		next.generation = ck_pr_load_ptr(&tail.pointer->next.generation);
-		next.pointer = ck_pr_load_ptr(&tail.pointer->next.pointer);
+		tail.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&fifo->tail.pointer);
+		next.generation = (char *)ck_pr_load_ptr(&tail.pointer->next.generation);
+		next.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&tail.pointer->next.pointer);
 
 		if (ck_pr_load_ptr(&fifo->tail.generation) != tail.generation)
 			continue;
@@ -292,11 +302,11 @@ ck_fifo_mpmc_tryenqueue(struct ck_fifo_mpmc *fifo,
 
 	ck_pr_fence_store_atomic();
 
-	tail.generation = ck_pr_load_ptr(&fifo->tail.generation);
+	tail.generation = (char *)ck_pr_load_ptr(&fifo->tail.generation);
 	ck_pr_fence_load();
-	tail.pointer = ck_pr_load_ptr(&fifo->tail.pointer);
-	next.generation = ck_pr_load_ptr(&tail.pointer->next.generation);
-	next.pointer = ck_pr_load_ptr(&tail.pointer->next.pointer);
+	tail.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&fifo->tail.pointer);
+	next.generation = (char *)ck_pr_load_ptr(&tail.pointer->next.generation);
+	next.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&tail.pointer->next.pointer);
 
 	if (ck_pr_load_ptr(&fifo->tail.generation) != tail.generation)
 		return false;
@@ -339,15 +349,15 @@ ck_fifo_mpmc_dequeue(struct ck_fifo_mpmc *fifo,
 	struct ck_fifo_mpmc_pointer head, tail, next, update;
 
 	for (;;) {
-		head.generation = ck_pr_load_ptr(&fifo->head.generation);
+		head.generation = (char *)ck_pr_load_ptr(&fifo->head.generation);
 		ck_pr_fence_load();
-		head.pointer = ck_pr_load_ptr(&fifo->head.pointer);
-		tail.generation = ck_pr_load_ptr(&fifo->tail.generation);
+		head.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&fifo->head.pointer);
+		tail.generation = (char *)ck_pr_load_ptr(&fifo->tail.generation);
 		ck_pr_fence_load();
-		tail.pointer = ck_pr_load_ptr(&fifo->tail.pointer);
+		tail.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&fifo->tail.pointer);
 
-		next.generation = ck_pr_load_ptr(&head.pointer->next.generation);
-		next.pointer = ck_pr_load_ptr(&head.pointer->next.pointer);
+		next.generation = (char *)ck_pr_load_ptr(&head.pointer->next.generation);
+		next.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&head.pointer->next.pointer);
 
 		update.pointer = next.pointer;
 		if (head.pointer == tail.pointer) {
@@ -392,16 +402,16 @@ ck_fifo_mpmc_trydequeue(struct ck_fifo_mpmc *fifo,
 {
 	struct ck_fifo_mpmc_pointer head, tail, next, update;
 
-	head.generation = ck_pr_load_ptr(&fifo->head.generation);
+	head.generation = (char *)ck_pr_load_ptr(&fifo->head.generation);
 	ck_pr_fence_load();
-	head.pointer = ck_pr_load_ptr(&fifo->head.pointer);
+	head.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&fifo->head.pointer);
 
-	tail.generation = ck_pr_load_ptr(&fifo->tail.generation);
+	tail.generation = (char *)ck_pr_load_ptr(&fifo->tail.generation);
 	ck_pr_fence_load();
-	tail.pointer = ck_pr_load_ptr(&fifo->tail.pointer);
+	tail.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&fifo->tail.pointer);
 
-	next.generation = ck_pr_load_ptr(&head.pointer->next.generation);
-	next.pointer = ck_pr_load_ptr(&head.pointer->next.pointer);
+	next.generation = (char *)ck_pr_load_ptr(&head.pointer->next.generation);
+	next.pointer = (struct ck_fifo_mpmc_entry *)ck_pr_load_ptr(&head.pointer->next.pointer);
 
 	update.pointer = next.pointer;
 	if (head.pointer == tail.pointer) {

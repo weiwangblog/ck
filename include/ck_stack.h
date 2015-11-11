@@ -55,7 +55,7 @@ ck_stack_push_upmc(struct ck_stack *target, struct ck_stack_entry *entry)
 {
 	struct ck_stack_entry *stack;
 
-	stack = ck_pr_load_ptr(&target->head);
+	stack = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 	entry->next = stack;
 	ck_pr_fence_store();
 
@@ -79,7 +79,7 @@ ck_stack_trypush_upmc(struct ck_stack *target, struct ck_stack_entry *entry)
 {
 	struct ck_stack_entry *stack;
 
-	stack = ck_pr_load_ptr(&target->head);
+	stack = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 	entry->next = stack;
 	ck_pr_fence_store();
 
@@ -97,7 +97,7 @@ ck_stack_pop_upmc(struct ck_stack *target)
 {
 	struct ck_stack_entry *entry, *next;
 
-	entry = ck_pr_load_ptr(&target->head);
+	entry = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 	if (entry == NULL)
 		return NULL;
 
@@ -128,7 +128,7 @@ ck_stack_trypop_upmc(struct ck_stack *target, struct ck_stack_entry **r)
 {
 	struct ck_stack_entry *entry;
 
-	entry = ck_pr_load_ptr(&target->head);
+	entry = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 	if (entry == NULL)
 		return false;
 
@@ -152,7 +152,7 @@ ck_stack_batch_pop_upmc(struct ck_stack *target)
 {
 	struct ck_stack_entry *entry;
 
-	entry = ck_pr_fas_ptr(&target->head, NULL);
+	entry = (struct ck_stack_entry *)ck_pr_fas_ptr(&target->head, NULL);
 	ck_pr_fence_load();
 	return entry;
 }
@@ -196,8 +196,8 @@ ck_stack_pop_mpmc(struct ck_stack *target)
 {
 	struct ck_stack original, update;
 
-	original.generation = ck_pr_load_ptr(&target->generation);
-	original.head = ck_pr_load_ptr(&target->head);
+	original.generation = (char *)ck_pr_load_ptr(&target->generation);
+	original.head = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 	if (original.head == NULL)
 		return NULL;
 
@@ -227,8 +227,8 @@ ck_stack_trypop_mpmc(struct ck_stack *target, struct ck_stack_entry **r)
 {
 	struct ck_stack original, update;
 
-	original.generation = ck_pr_load_ptr(&target->generation);
-	original.head = ck_pr_load_ptr(&target->head);
+	original.generation = (char *)ck_pr_load_ptr(&target->generation);
+	original.head = (struct ck_stack_entry *)ck_pr_load_ptr(&target->head);
 	if (original.head == NULL)
 		return false;
 
@@ -272,7 +272,7 @@ ck_stack_push_mpnc(struct ck_stack *target, struct ck_stack_entry *entry)
 
 	entry->next = NULL;
 	ck_pr_fence_store();
-	stack = ck_pr_fas_ptr(&target->head, entry);
+	stack = (struct ck_stack_entry *)ck_pr_fas_ptr(&target->head, entry);
 	ck_pr_store_ptr(&entry->next, stack);
 	ck_pr_fence_store();
 

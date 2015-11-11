@@ -103,7 +103,7 @@
 
 struct ck_bitmap {
 	unsigned int n_bits;
-	CK_BITMAP_WORD map[];
+	CK_BITMAP_WORD map[1];
 };
 typedef struct ck_bitmap ck_bitmap_t;
 

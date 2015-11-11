@@ -82,8 +82,8 @@ ck_ring_capacity(struct ck_ring *ring)
  */
 CK_CC_INLINE static bool
 _ck_ring_enqueue_spsc_size(struct ck_ring *ring,
-    void *restrict buffer,
-    const void *restrict entry,
+    void *buffer,
+    const void *entry,
     unsigned int type_size,
     unsigned int *size)
 {
@@ -129,8 +129,8 @@ ck_ring_enqueue_spsc_size(struct ck_ring *ring,
  */
 CK_CC_INLINE static bool
 _ck_ring_enqueue_spsc(struct ck_ring *ring,
-    void *restrict destination,
-    const void *restrict source,
+    void *destination,
+    const void *source,
     unsigned int size)
 {
 	unsigned int consumer, producer, delta;
@@ -170,8 +170,8 @@ ck_ring_enqueue_spsc(struct ck_ring *ring,
  */
 CK_CC_INLINE static bool
 _ck_ring_dequeue_spsc(struct ck_ring *ring,
-    void *restrict buffer,
-    void *restrict target,
+    void *buffer,
+    void *target,
     unsigned int size)
 {
 	unsigned int consumer, producer;
@@ -250,7 +250,7 @@ ck_ring_enqueue_spmc(struct ck_ring *ring,
 
 CK_CC_INLINE static bool
 _ck_ring_trydequeue_spmc(struct ck_ring *ring,
-    void *restrict buffer,
+    void *buffer,
     void *data,
     unsigned int size)
 {

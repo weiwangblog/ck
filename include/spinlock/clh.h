@@ -59,7 +59,7 @@ ck_spinlock_clh_locked(struct ck_spinlock_clh **queue)
 	struct ck_spinlock_clh *head;
 
 	ck_pr_fence_load();
-	head = ck_pr_load_ptr(queue);
+	head = (struct ck_spinlock_clh *)ck_pr_load_ptr(queue);
 	ck_pr_fence_load();
 	return ck_pr_load_uint(&head->wait);
 }
@@ -74,7 +74,7 @@ ck_spinlock_clh_lock(struct ck_spinlock_clh **queue, struct ck_spinlock_clh *thr
 	ck_pr_fence_store_atomic();
 
 	/* Mark current request as last request. Save reference to previous request. */
-	previous = ck_pr_fas_ptr(queue, thread);
+	previous = (struct ck_spinlock_clh *)ck_pr_fas_ptr(queue, thread);
 	thread->previous = previous;
 
 	/* Wait until previous thread is done with lock. */

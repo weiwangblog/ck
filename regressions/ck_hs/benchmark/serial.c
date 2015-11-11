@@ -250,7 +250,7 @@ run_test(const char *file, size_t r, unsigned int size, unsigned int mode)
 	set_init(size, mode);
 	for (i = 0; i < keys_length; i++)
 		d += set_insert(keys[i]) == false;
-	ck_hs_stat(&hs, &st);
+	ck_hs_stat_get(&hs, &st);
 
 	fprintf(stderr, "# %zu entries stored, %u duplicates, %u probe.\n",
 	    set_count(), d, st.probe_maximum);

@@ -29,8 +29,8 @@
 #include <ck_pr.h>
 
 void
-ck_barrier_centralized(struct ck_barrier_centralized *barrier,
-    struct ck_barrier_centralized_state *state,
+ck_barrier_centralized(ck_barrier_centralized_t *barrier,
+    ck_barrier_centralized_state_t *state,
     unsigned int n_threads)
 {
 	unsigned int sense, value;
